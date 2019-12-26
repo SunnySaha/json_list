@@ -1,7 +1,7 @@
 
 import 'dart:async';
 import 'dart:convert';
-
+import 'package:project_flutter/mysql.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as https;
 
@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Json Parsing Flutter',
       theme: ThemeData(
 
         primarySwatch: Colors.deepOrange,
@@ -47,6 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Icon _searchIcon = new Icon(Icons.search);
   Widget _appBarTitle = new Text( 'Json Search' );
 
+
   _MyHomePageState() {
     _filter.addListener(() {
       if (_filter.text.isEmpty) {
@@ -78,30 +79,32 @@ class _MyHomePageState extends State<MyHomePage> {
 
     });
 
-    print(data[0]['name']);
-
     return "Success!";
   }
 
-//  Future agetData() async{
-//    var url = "https://readysteadypoo.000webhostapp.com/get.php";
-//    https.Response response = await https.get(url);
-//    var data = jsonDecode(response.body);
-//    var list = data.toString().split(',');
-//    return 'Succes';
-//  }
+
 
   @override
   void initState() {
     super.initState();
     getData();
-    //agetData();
   }
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
       appBar: AppBar(
+
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.arrow_forward, color: Colors.white,),
+            onPressed:(){
+              Navigator.push(context, MaterialPageRoute(builder: (context){
+                return mysql();
+              }));
+            },
+          )
+        ],
 
         leading: IconButton(
           icon: _searchIcon,
