@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:project_flutter/details.dart';
 import 'package:project_flutter/create_data.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:project_flutter/main.dart';
 
 class mysql extends StatefulWidget {
   @override
@@ -19,6 +19,7 @@ class _Mysql extends State<mysql> {
   ScrollController _controller;
   List data = new List();
   String message = '';
+  int index;
 
 //  var list;
 //  Future getData() async{
@@ -77,7 +78,7 @@ class _Mysql extends State<mysql> {
       body: ListView.builder(
         itemCount: data == null ? 0 : data.length,
         controller: _controller,
-        itemBuilder: (BuildContext context, int index) {
+        itemBuilder: (BuildContext context, index) {
           return Padding(
             padding: const EdgeInsets.only(top: 8.0, left: 2.0, right: 2.0),
             child: Container(
@@ -88,9 +89,10 @@ class _Mysql extends State<mysql> {
                 semanticContainer: true,
                 clipBehavior: Clip.antiAliasWithSaveLayer,
                 child: ListTile(
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete_forever, color: Colors.indigo),
-                    onPressed: () {
+                  trailing:GestureDetector(
+                    child: Icon(Icons.delete_forever, color: Colors.red,),
+
+                    onTap: (){
                       showDialog(
                           context: context,
                           builder: (BuildContext context) {
@@ -104,14 +106,43 @@ class _Mysql extends State<mysql> {
                                   ),
                                   FlatButton(
                                     child: Text("Want To delete?"),
-                                    onPressed: () {},
+                                    onPressed: () {
+
+                                      Navigator.of(context).pop();
+
+                                     var url = 'https://readysteadypoo.000webhostapp.com/delete.php';
+                                     https.post(url, body: {
+                                       "id": data[index]['id'],
+                                     });
+
+                                     showDialog(
+                                         context: context,
+                                         builder: (BuildContext context) {
+                                           return AlertDialog(
+                                               actions: [
+                                                 FlatButton(
+                                                   child: Text("OK"),
+                                                   onPressed: () {
+                                                     Navigator.of(context).pop();
+                                                     getData();
+                                                   },
+                                                 ),
+                                               ],
+                                               title: Text("Success", style: (TextStyle(color: Colors.blue, fontSize: 19.0)),),
+                                               content: Text("Data Deleted Successfully"));
+                                         });
+
+                                    },
                                   )
                                 ],
-                                title: Text("Alert!!!"),
-                                content: Text("Want to create Information?"));
+                                title: Text("Warning", style: (TextStyle(color: Colors.red, fontSize: 20.0)),),
+                                content: Text("Want to Delete ${data[index]['name']}?", style: (TextStyle(color: Colors.black, fontSize: 16.0)),));
                           });
                     },
+
                   ),
+
+
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute(
                         builder: (context) =>
@@ -208,4 +239,6 @@ class _Mysql extends State<mysql> {
       });
     }
   }
+
+
 }
