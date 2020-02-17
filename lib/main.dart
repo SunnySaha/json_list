@@ -37,6 +37,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
 
+  var refkey = GlobalKey<RefreshIndicatorState>();
   final TextEditingController _filter = new TextEditingController();
 
 
@@ -64,6 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<String> getData() async {
+    await Future.delayed(Duration(seconds: 1));
     var response = await https.get(
       Uri.encodeFull("https://swapi.co/api/people/"),
         headers: {
@@ -79,7 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     });
 
-    return "Success!";
+    return 'Success';
   }
 
 
@@ -116,7 +118,12 @@ class _MyHomePageState extends State<MyHomePage> {
         centerTitle: true,
       ),
 
-      body: _buildList(),
+      body: RefreshIndicator(
+
+        child: _buildList(),
+
+        onRefresh: getData,
+      ),
     );
   }
 

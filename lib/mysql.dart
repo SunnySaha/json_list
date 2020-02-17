@@ -39,6 +39,8 @@ class _Mysql extends State<mysql> {
 //  }
 
   Future<String> getData() async {
+
+    await Future.delayed(Duration(seconds: 1));
     var response = await https.get(
         Uri.encodeFull("https://readysteadypoo.000webhostapp.com/get.php"),
         headers: {"Accept": "application/json"});
@@ -75,88 +77,89 @@ class _Mysql extends State<mysql> {
         title: Text("Data From Mysql $message"),
         centerTitle: true,
       ),
-      body: ListView.builder(
-        itemCount: data == null ? 0 : data.length,
-        controller: _controller,
-        itemBuilder: (BuildContext context, index) {
-          return Padding(
-            padding: const EdgeInsets.only(top: 8.0, left: 2.0, right: 2.0),
-            child: Container(
-              height: 120,
-              child: Card(
-                elevation: 5,
-                margin: EdgeInsets.all(10),
-                semanticContainer: true,
-                clipBehavior: Clip.antiAliasWithSaveLayer,
-                child: ListTile(
-                  trailing:GestureDetector(
-                    child: Icon(Icons.delete_forever, color: Colors.red,),
+      body: RefreshIndicator(
+        child: ListView.builder(
+          itemCount: data == null ? 0 : data.length,
+          controller: _controller,
+          itemBuilder: (BuildContext context, index) {
+            return Padding(
+              padding: const EdgeInsets.only(top: 8.0, left: 2.0, right: 2.0),
+              child: Container(
+                height: 120,
+                child: Card(
+                  elevation: 5,
+                  margin: EdgeInsets.all(10),
+                  semanticContainer: true,
+                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                  child: ListTile(
+                    trailing:GestureDetector(
+                      child: Icon(Icons.delete_forever, color: Colors.red,),
 
-                    onTap: (){
-                      showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                                actions: [
-                                  FlatButton(
-                                    child: Text("Close.."),
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
-                                  FlatButton(
-                                    child: Text("Want To delete?"),
-                                    onPressed: () {
+                      onTap: (){
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                  actions: [
+                                    FlatButton(
+                                      child: Text("Close.."),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                    FlatButton(
+                                      child: Text("Want To delete?"),
+                                      onPressed: () {
 
-                                      Navigator.of(context).pop();
+                                        Navigator.of(context).pop();
 
-                                     var url = 'https://readysteadypoo.000webhostapp.com/delete.php';
-                                     https.post(url, body: {
-                                       "id": data[index]['id'],
-                                     });
+                                       var url = 'https://readysteadypoo.000webhostapp.com/delete.php';
+                                       https.post(url, body: {
+                                         "id": data[index]['id'],
+                                       });
 
-                                     showDialog(
-                                         context: context,
-                                         builder: (BuildContext context) {
-                                           return AlertDialog(
-                                               actions: [
-                                                 FlatButton(
-                                                   child: Text("OK"),
-                                                   onPressed: () {
-                                                     Navigator.of(context).pop();
-                                                     getData();
-                                                   },
-                                                 ),
-                                               ],
-                                               title: Text("Success", style: (TextStyle(color: Colors.blue, fontSize: 19.0)),),
-                                               content: Text("Data Deleted Successfully"));
-                                         });
+                                       showDialog(
+                                           context: context,
+                                           builder: (BuildContext context) {
+                                             return AlertDialog(
+                                                 actions: [
+                                                   FlatButton(
+                                                     child: Text("OK"),
+                                                     onPressed: () {
+                                                       Navigator.of(context).pop();
+                                                       getData();
+                                                     },
+                                                   ),
+                                                 ],
+                                                 title: Text("Success", style: (TextStyle(color: Colors.blue, fontSize: 19.0)),),
+                                                 content: Text("Data Deleted Successfully"));
+                                           });
 
-                                    },
-                                  )
-                                ],
-                                title: Text("Warning", style: (TextStyle(color: Colors.red, fontSize: 20.0)),),
-                                content: Text("Want to Delete ${data[index]['name']}?", style: (TextStyle(color: Colors.black, fontSize: 16.0)),));
-                          });
-                    },
+                                      },
+                                    )
+                                  ],
+                                  title: Text("Warning", style: (TextStyle(color: Colors.red, fontSize: 20.0)),),
+                                  content: Text("Want to Delete ${data[index]['name']}?", style: (TextStyle(color: Colors.black, fontSize: 16.0)),));
+                            });
+                      },
 
+                    ),
+
+
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              details(data: data, index: index)),
+                    ),
+                    title: Text(
+                      data[index]['name'],
+                      style: TextStyle(color: Colors.purple, fontSize: 22.0),
+                    ),
+                    subtitle: Text(
+                      data[index]['gender'],
+                      style: TextStyle(color: Colors.deepPurple, fontSize: 18.0),
+                    ),
                   ),
-
-
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            details(data: data, index: index)),
-                  ),
-                  title: Text(
-                    data[index]['name'],
-                    style: TextStyle(color: Colors.purple, fontSize: 22.0),
-                  ),
-                  subtitle: Text(
-                    data[index]['gender'],
-                    style: TextStyle(color: Colors.deepPurple, fontSize: 18.0),
-                  ),
-                ),
 
 //              child: Container(
 //                height: 150,
@@ -191,10 +194,12 @@ class _Mysql extends State<mysql> {
 //                  ),
 //                ),
 //              ),
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
+        onRefresh: getData,
       ),
 //      floatingActionButton:
 //          FloatingActionButton(child: Icon(Icons.add), onPressed: () {
